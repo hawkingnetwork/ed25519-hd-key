@@ -1,5 +1,5 @@
 {
-  "name": "ed25519-hd-key",
+  "name": "@dn3010/ed25519-hd-key",
   "version": "1.0.0",
   "description": "BIP-0032 like derivation for ed25519 curve",
   "main": "dist/index.js",
@@ -47,8 +47,8 @@
   "author": "Aleksey Popov",
   "license": "GPL-3",
   "dependencies": {
-    "bip39": "^2.4.0",
     "create-hmac": "^1.1.6",
+    "crypto-js": "^3.1.9-1",
     "js-nacl": "^1.2.2"
   },
   "devDependencies": {

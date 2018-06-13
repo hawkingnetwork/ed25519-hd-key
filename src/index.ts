@@ -1,13 +1,8 @@
-import * as createHmac from 'create-hmac'
-import * as naclFactory from 'js-nacl';
+var CryptoJS = require("crypto-js");
+const Sodium = require('react-native-sodium');
 
 import { replaceDerive, pathRegex } from './utils';
 
-interface Nacl {
-    crypto_sign_seed_keypair: (
-        val: Buffer,
-    ) => { signPk: Buffer; signSk: Buffer };
-}
 type Hex = string;
 type Path = string;
 
@@ -19,11 +14,10 @@ type Keys = {
 const ED25519_CURVE = 'ed25519 seed';
 const HARDENED_OFFSET = 0x80000000;
 
-let naclInstance: Nacl;
-naclFactory.instantiate((nacl: Nacl) => (naclInstance = nacl));
 
 export const getMasterKeyFromSeed = (seed: Hex): Keys => {
-    const hmac = createHmac('sha512', ED25519_CURVE);
+    const hmac = CryptoJS.algo.HMAC.create(CryptoJS.algo.SHA512, ED25519_CURVE);
+    // const hmac = createHmac('sha512', ED25519_CURVE);
     const I = hmac.update(Buffer.from(seed, 'hex')).digest();
     const IL = I.slice(0, 32);
     const IR = I.slice(32);
@@ -39,7 +33,8 @@ const CKDPriv = ({ key, chainCode }: Keys, index: number): Keys => {
 
     const data = Buffer.concat([Buffer.alloc(1, 0), key, indexBuffer]);
 
-    const I = createHmac('sha512', chainCode)
+
+    const I = CryptoJS.algo.HMAC.create(CryptoJS.algo.SHA512, chainCode)
         .update(data)
         .digest();
     const IL = I.slice(0, 32);
@@ -50,8 +45,9 @@ const CKDPriv = ({ key, chainCode }: Keys, index: number): Keys => {
     };
 };
 
-export const getPublicKey = (privateKey: Buffer, withZeroByte = true): Buffer => {
-    const { signPk } = naclInstance.crypto_sign_seed_keypair(privateKey);
+export const getPublicKey = async (privateKey: Buffer, withZeroByte = true): Promise<Buffer> => {
+    const { pk } = await Sodium.crypto_sign_seed_keypair(privateKey.toString('base64'));
+    const signPk = new Buffer(pk, 'base64');
     const zero = Buffer.alloc(1, 0);
     return withZeroByte ?
         Buffer.concat([zero, Buffer.from(signPk)]) :
