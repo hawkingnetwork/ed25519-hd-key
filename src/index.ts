@@ -1,5 +1,5 @@
 var CryptoJS = require("crypto-js");
-const Sodium = require('react-native-sodium');
+const Sodium = require('react-native-sodium').default;
 
 import { replaceDerive, pathRegex } from './utils';
 
@@ -17,8 +17,7 @@ const HARDENED_OFFSET = 0x80000000;
 
 export const getMasterKeyFromSeed = (seed: Hex): Keys => {
     const hmac = CryptoJS.algo.HMAC.create(CryptoJS.algo.SHA512, ED25519_CURVE);
-    // const hmac = createHmac('sha512', ED25519_CURVE);
-    const I = hmac.update(Buffer.from(seed, 'hex')).digest();
+    const I = Buffer.from(hmac.update(Buffer.from(seed, 'hex')).finalize().toString());
     const IL = I.slice(0, 32);
     const IR = I.slice(32);
     return {
@@ -34,9 +33,9 @@ const CKDPriv = ({ key, chainCode }: Keys, index: number): Keys => {
     const data = Buffer.concat([Buffer.alloc(1, 0), key, indexBuffer]);
 
 
-    const I = CryptoJS.algo.HMAC.create(CryptoJS.algo.SHA512, chainCode)
+    const I = Buffer.from(CryptoJS.algo.HMAC.create(CryptoJS.algo.SHA512, chainCode.toString())
         .update(data)
-        .digest();
+        .finalize().toString());
     const IL = I.slice(0, 32);
     const IR = I.slice(32);
     return {
