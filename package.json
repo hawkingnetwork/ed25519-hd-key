@@ -16,6 +16,7 @@
   },
   "homepage": "https://github.com/alepop/ed25519-hd-key",
   "scripts": {
+    "postinstall": "react-native link react-native-sodium",
     "build": "tsc -p ./",
     "test": "jest"
   },
@@ -49,7 +50,7 @@
   "dependencies": {
     "create-hmac": "^1.1.6",
     "crypto-js": "^3.1.9-1",
-    "js-nacl": "^1.2.2"
+    "react-native-sodium": "https://github.com/hawkingnetwork/react-native-sodium.git"
   },
   "devDependencies": {
     "@types/jest": "^21.1.8",
