@@ -16,7 +16,6 @@
   },
   "homepage": "https://github.com/alepop/ed25519-hd-key",
   "scripts": {
-    "postinstall": "react-native link react-native-sodium",
     "build": "tsc -p ./",
     "test": "jest"
   },
